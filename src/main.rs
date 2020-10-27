@@ -1,6 +1,11 @@
 use hecs::*;
 use ggez::*;
 
+use rapier2d::na::Vector2;
+use rapier2d::dynamics::{JointSet, RigidBodySet, IntegrationParameters};
+use rapier2d::geometry::{BroadPhase, NarrowPhase, ColliderSet};
+use rapier2d::pipeline::PhysicsPipeline;
+
 mod components;
 use components::*;
 
@@ -21,6 +26,8 @@ impl MainState {
 
 impl event::EventHandler for MainState {
     fn update (&mut self, context: &mut Context) -> GameResult {
+        system_physics(&mut self.world, context);
+
         Ok(())
     }
 
@@ -53,6 +60,9 @@ fn main () -> GameResult {
         },
         Rect {
             rect: graphics::Rect::new(0.0, 0.0, 32.0, 32.0),
+        },
+        Physics {
+            velocity: nalgebra::Vector2::new(5.0, 0.0),
         }
     ));
 

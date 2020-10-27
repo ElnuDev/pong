@@ -9,3 +9,4 @@ edition = "2018"
 [dependencies]
 ggez = "0.5.1"
 hecs = "0.2.15"
+rapier2d = "0.3.0"
