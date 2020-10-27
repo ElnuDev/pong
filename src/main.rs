@@ -26,8 +26,6 @@ impl MainState {
 
 impl event::EventHandler for MainState {
     fn update (&mut self, context: &mut Context) -> GameResult {
-        system_physics(&mut self.world, context);
-
         Ok(())
     }
 
@@ -43,7 +41,7 @@ impl event::EventHandler for MainState {
 }
 
 fn main () -> GameResult {
-    // Set up
+    // Set up ggez
 
     let context_builder = ContextBuilder::new("ecs-testing", "Elnu");
     let (mut context, mut event_loop) = context_builder.build()?;
@@ -52,6 +50,20 @@ fn main () -> GameResult {
 
     let mut main_state = MainState::new();
     
+    // Set up physics
+
+    // Here the gravity is -9.81 along the y axis.
+    let mut pipeline = PhysicsPipeline::new();
+    let gravity = Vector2::new(0.0, -9.81);
+    let integration_parameters = IntegrationParameters::default();
+    let mut broad_phase = BroadPhase::new();
+    let mut narrow_phase = NarrowPhase::new();
+    let mut bodies = RigidBodySet::new();
+    let mut colliders = ColliderSet::new();
+    let mut joints = JointSet::new();
+    // We ignore contact events for now.
+    let event_handler = ();
+
     // Create entities
 
     let entity = main_state.world.spawn((
@@ -61,9 +73,6 @@ fn main () -> GameResult {
         Rect {
             rect: graphics::Rect::new(0.0, 0.0, 32.0, 32.0),
         },
-        Physics {
-            velocity: nalgebra::Vector2::new(5.0, 0.0),
-        }
     ));
 
     // Run event loop
