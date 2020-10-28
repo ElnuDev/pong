@@ -1,10 +1,8 @@
 use hecs::*;
 use ggez::*;
 
-use rapier2d::na::Vector2;
-use rapier2d::dynamics::{JointSet, RigidBodySet, IntegrationParameters};
-use rapier2d::geometry::{BroadPhase, NarrowPhase, ColliderSet};
-use rapier2d::pipeline::PhysicsPipeline;
+use rapier2d::dynamics::RigidBodyBuilder;
+use rapier2d::geometry::ColliderBuilder;
 
 mod components;
 use components::*;
@@ -12,27 +10,34 @@ use components::*;
 mod systems;
 use systems::*;
 
+mod physics_world;
+use physics_world::*;
+
 struct MainState {
     world: World,
+    physics_world: PhysicsWorld,
 }
 
 impl MainState {
     fn new () -> MainState {
         MainState {
             world: World::new(),
+            physics_world: PhysicsWorld::new(),
         }
     }
 }
 
 impl event::EventHandler for MainState {
     fn update (&mut self, context: &mut Context) -> GameResult {
+        system_physics(&mut self.physics_world, context);
+
         Ok(())
     }
 
     fn draw (&mut self, context: &mut Context) -> GameResult {
         graphics::clear(context, graphics::BLACK);
 
-        system_rect_draw(&mut self.world, context);
+        system_rect_draw(&mut self.world, &mut self.physics_world, context);
 
         graphics::present(context)?;
 
@@ -43,36 +48,34 @@ impl event::EventHandler for MainState {
 fn main () -> GameResult {
     // Set up ggez
 
-    let context_builder = ContextBuilder::new("ecs-testing", "Elnu");
+    let context_builder = ContextBuilder::new("Pong", "Elnu");
     let (mut context, mut event_loop) = context_builder.build()?;
 
-    graphics::set_window_title(&context, "ecs-testing");
+    graphics::set_window_title(&context, "Pong");
 
     let mut main_state = MainState::new();
     
     // Set up physics
 
-    // Here the gravity is -9.81 along the y axis.
-    let mut pipeline = PhysicsPipeline::new();
-    let gravity = Vector2::new(0.0, -9.81);
-    let integration_parameters = IntegrationParameters::default();
-    let mut broad_phase = BroadPhase::new();
-    let mut narrow_phase = NarrowPhase::new();
-    let mut bodies = RigidBodySet::new();
-    let mut colliders = ColliderSet::new();
-    let mut joints = JointSet::new();
-    // We ignore contact events for now.
-    let event_handler = ();
-
     // Create entities
 
+    let rigid_body_handle = main_state.physics_world.rigid_body_set.insert(
+        RigidBodyBuilder::new_dynamic().build()
+    );
+    main_state.physics_world.collider_set.insert(
+        ColliderBuilder::ball(0.5).build(),
+        rigid_body_handle,
+        &mut main_state.physics_world.rigid_body_set
+    );
+
     let entity = main_state.world.spawn((
-        Transform {
-            position: nalgebra::Point2::new(0.0, 0.0),
-        },
-        Rect {
+        RectComponent {
             rect: graphics::Rect::new(0.0, 0.0, 32.0, 32.0),
         },
+
+        RigidBodyComponent {
+            rigid_body_handle,
+        }
     ));
 
     // Run event loop

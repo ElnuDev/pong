@@ -1,5 +1,5 @@
 use ggez::*;
 
-pub struct Transform {
+pub struct TransformComponent {
     pub position: nalgebra::Point2<f32>,
 }

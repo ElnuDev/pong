@@ -1,5 +1,5 @@
 use ggez::*;
 
-pub struct Rect {
+pub struct RectComponent {
     pub rect: graphics::Rect,
 }

@@ -1,5 +1,8 @@
 mod rect;
-pub use rect::Rect;
+pub use rect::RectComponent;
 
 mod transform;
-pub use transform::Transform;
+pub use transform::TransformComponent;
+
+mod rigidbody;
+pub use rigidbody::RigidBodyComponent;

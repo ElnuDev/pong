@@ -1367,6 +1367,7 @@ dependencies = [
  "approx 0.4.0",
  "generic-array 0.14.4",
  "matrixmultiply",
+ "mint",
  "num-complex 0.3.0",
  "num-rational 0.3.0",
  "num-traits 0.2.12",
@@ -1670,6 +1671,7 @@ version = "0.1.0"
 dependencies = [
  "ggez",
  "hecs",
+ "nalgebra 0.23.0",
  "rapier2d",
 ]
 
