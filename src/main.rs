@@ -4,6 +4,9 @@ use ggez::*;
 use rapier2d::dynamics::RigidBodyBuilder;
 use rapier2d::geometry::ColliderBuilder;
 
+use std::env;
+use std::path;
+
 mod components;
 use components::*;
 
@@ -37,6 +40,7 @@ impl event::EventHandler for MainState {
     fn draw (&mut self, context: &mut Context) -> GameResult {
         graphics::clear(context, graphics::BLACK);
 
+        system_sprite_draw(&mut self.world, &mut self.physics_world, context);
         system_rect_draw(&mut self.world, &mut self.physics_world, context);
 
         graphics::present(context)?;
@@ -46,9 +50,19 @@ impl event::EventHandler for MainState {
 }
 
 fn main () -> GameResult {
+    // We add the CARGO_MANIFEST_DIR/resources to the resource paths
+    // so that ggez will look in our cargo project directory for files.
+    let resource_dir = if let Ok(manifest_dir) = env::var("CARGO_MANIFEST_DIR") {
+        let mut path = path::PathBuf::from(manifest_dir);
+        path.push("resources");
+        path
+    } else {
+        path::PathBuf::from("./resources")
+    };
+
     // Set up ggez
 
-    let context_builder = ContextBuilder::new("Pong", "Elnu");
+    let context_builder = ContextBuilder::new("Pong", "Elnu").add_resource_path(resource_dir);
     let (mut context, mut event_loop) = context_builder.build()?;
 
     graphics::set_window_title(&context, "Pong");
@@ -60,7 +74,7 @@ fn main () -> GameResult {
     // Create entities
 
     let rigid_body_handle = main_state.physics_world.rigid_body_set.insert(
-        RigidBodyBuilder::new_dynamic().build()
+        RigidBodyBuilder::new_dynamic().translation(64.0, 0.0).build()
     );
     main_state.physics_world.collider_set.insert(
         ColliderBuilder::ball(0.5).build(),
@@ -69,12 +83,14 @@ fn main () -> GameResult {
     );
 
     let entity = main_state.world.spawn((
-        RectComponent {
-            rect: graphics::Rect::new(0.0, 0.0, 32.0, 32.0),
-        },
-
+        //RectComponent {
+        //    rect: graphics::Rect::new(0.0, 0.0, 32.0, 32.0),
+        //},
         RigidBodyComponent {
             rigid_body_handle,
+        },
+        SpriteComponent {
+            image: graphics::Image::new(&mut context, "/rust.png").unwrap(),
         }
     ));
 
