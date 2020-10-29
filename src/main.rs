@@ -1,5 +1,14 @@
 use hecs::*;
-use ggez::*;
+use ggez::{
+    graphics,
+    Context,
+    ContextBuilder,
+    event,
+    GameResult,
+    conf
+};
+
+use rand::Rng;
 
 use rapier2d::dynamics::RigidBodyBuilder;
 use rapier2d::geometry::ColliderBuilder;
@@ -99,10 +108,21 @@ fn main () -> GameResult {
     // Create ball 2
 
     let rigid_body_handle = main_state.physics_world.rigid_body_set.insert(
-        RigidBodyBuilder::new_dynamic().translation(graphics::drawable_size(&context).0 / settings::UNIT_SIZE / 2.0 - 0.1, -1.0).build()
+        RigidBodyBuilder::new_dynamic().translation(graphics::drawable_size(&context).0 / settings::UNIT_SIZE / 2.0 - 0.1, 2.0).build()
     );
     main_state.physics_world.collider_set.insert(
-        ColliderBuilder::ball(0.5).build(),
+        ColliderBuilder::trimesh(
+            vec![
+                nalgebra::Point2::new(-1.0, 1.0) * rand::thread_rng().gen(),
+                nalgebra::Point2::new(1.0, 1.0) * rand::thread_rng().gen(),
+                nalgebra::Point2::new(1.0, -1.0) * rand::thread_rng().gen(),
+                nalgebra::Point2::new(-1.0, -1.0) * rand::thread_rng().gen()
+            ],
+            vec![
+                nalgebra::Point3::new(0, 1, 2),
+                nalgebra::Point3::new(0, 2, 3)
+            ]
+        ).build(),
         rigid_body_handle,
         &mut main_state.physics_world.rigid_body_set
     );

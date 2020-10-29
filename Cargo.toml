@@ -10,6 +10,7 @@ edition = "2018"
 ggez = "0.5.1"
 hecs = "0.2.15"
 rapier2d = "0.3.0"
+rand = "0.7.3"
 
 [dependencies.nalgebra]
 version = "0.23.0"

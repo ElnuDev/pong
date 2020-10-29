@@ -1672,6 +1672,7 @@ dependencies = [
  "ggez",
  "hecs",
  "nalgebra 0.23.0",
+ "rand 0.7.3",
  "rapier2d",
 ]
 
