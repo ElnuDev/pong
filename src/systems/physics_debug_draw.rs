@@ -81,12 +81,6 @@ pub fn system_physics_debug_draw(world: &mut World, physics_world: &mut PhysicsW
                             ).unwrap()
                         );
                     }
-                    // meshes.push(graphics::Mesh::new_polygon(
-                    //     context,
-                    //     draw_mode,
-                    //     &scaled_vertices,
-                    //     color
-                    // ).unwrap());
                 },
                 ShapeType::HeightField => {
                     let heightfield = shape.as_heightfield().unwrap();
