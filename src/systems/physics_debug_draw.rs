@@ -62,12 +62,31 @@ pub fn system_physics_debug_draw(world: &mut World, physics_world: &mut PhysicsW
                 },
                 ShapeType::Trimesh => {
                     let trimesh = shape.as_trimesh().unwrap();
-                    meshes.push(graphics::Mesh::new_polygon(
-                        context,
-                        draw_mode,
-                        &trimesh.vertices().iter().map(|vertex| vertex * settings::UNIT_SIZE).collect::<Vec<nalgebra::Point2<f32>>>(),
-                        color
-                    ).unwrap());
+                    let scaled_vertices = trimesh.vertices()
+                        .iter()
+                        .map(|vertex| vertex * settings::UNIT_SIZE)
+                        .collect::<Vec<nalgebra::Point2<f32>>>();
+                    let indices = trimesh.indices();
+                    for index in indices {
+                        meshes.push(
+                            graphics::Mesh::new_polygon(
+                                context,
+                                draw_mode,
+                                &vec![
+                                    scaled_vertices[index.x as usize],
+                                    scaled_vertices[index.y as usize],
+                                    scaled_vertices[index.z as usize]
+                                ],
+                                color
+                            ).unwrap()
+                        );
+                    }
+                    // meshes.push(graphics::Mesh::new_polygon(
+                    //     context,
+                    //     draw_mode,
+                    //     &scaled_vertices,
+                    //     color
+                    // ).unwrap());
                 },
                 ShapeType::HeightField => {
                     let heightfield = shape.as_heightfield().unwrap();
