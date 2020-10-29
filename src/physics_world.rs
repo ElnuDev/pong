@@ -5,6 +5,8 @@ use rapier2d::dynamics::{JointSet, RigidBodySet, IntegrationParameters};
 use rapier2d::geometry::{BroadPhase, NarrowPhase, ColliderSet};
 use rapier2d::pipeline::PhysicsPipeline;
 
+use crate::settings;
+
 pub struct PhysicsWorld {
     pub physics_pipeline: PhysicsPipeline,
     pub gravity: Vector2<f32>,
@@ -21,7 +23,7 @@ impl PhysicsWorld {
     pub fn new() -> PhysicsWorld {
         PhysicsWorld {
             physics_pipeline: PhysicsPipeline::new(),
-            gravity: Vector2::new(0.0, 9.81 * 32.0), // 32 pixels is one meter 
+            gravity: Vector2::new(0.0, settings::GRAVITY), // 32 pixels is one meter 
             integration_parameters: IntegrationParameters::default(),
             broad_phase: BroadPhase::new(),
             narrow_phase: NarrowPhase::new(),
