@@ -86,26 +86,26 @@ fn main () -> GameResult {
 
     // Create ball 1
 
-    let rigid_body_handle = main_state.physics_world.rigid_body_set.insert(
-        RigidBodyBuilder::new_dynamic().translation(graphics::drawable_size(&context).0 / settings::UNIT_SIZE / 2.0, 1.0).build()
-    );
-    main_state.physics_world.collider_set.insert(
-        ColliderBuilder::ball(0.5).build(),
-        rigid_body_handle,
-        &mut main_state.physics_world.rigid_body_set
-    );
+    // let rigid_body_handle = main_state.physics_world.rigid_body_set.insert(
+    //     RigidBodyBuilder::new_dynamic().translation(graphics::drawable_size(&context).0 / settings::UNIT_SIZE / 2.0, 1.0).build()
+    // );
+    // main_state.physics_world.collider_set.insert(
+    //     ColliderBuilder::ball(0.5).build(),
+    //     rigid_body_handle,
+    //     &mut main_state.physics_world.rigid_body_set
+    // );
 
-    let entity = main_state.world.spawn((
-        //RectComponent {
-        //    rect: graphics::Rect::new(0.0, 0.0, 32.0, 32.0),
-        //},
-        RigidBodyComponent {
-            rigid_body_handle,
-        },
-        SpriteComponent::new(&mut context, "/rust.png"),
-    ));
+    // let entity = main_state.world.spawn((
+    //     //RectComponent {
+    //     //    rect: graphics::Rect::new(0.0, 0.0, 32.0, 32.0),
+    //     //},
+    //     RigidBodyComponent {
+    //         rigid_body_handle,
+    //     },
+    //     SpriteComponent::new(&mut context, "/rust.png"),
+    // ));
 
-    // Create ball 2
+    // Create polygon
 
     let rigid_body_handle = main_state.physics_world.rigid_body_set.insert(
         RigidBodyBuilder::new_dynamic().translation(graphics::drawable_size(&context).0 / settings::UNIT_SIZE / 2.0 - 0.1, 2.0).build()
@@ -126,6 +126,9 @@ fn main () -> GameResult {
         rigid_body_handle,
         &mut main_state.physics_world.rigid_body_set
     );
+    main_state.physics_world.rigid_body_set.get_mut(rigid_body_handle)
+        .unwrap()
+        .mass_properties.inv_mass = 0.5;
 
     let entity = main_state.world.spawn((
         //RectComponent {
@@ -162,6 +165,32 @@ fn main () -> GameResult {
         },
         SpriteComponent::new(&mut context, "/rust.png"),
     ));
+
+    // Segment
+
+    // let rigid_body_handle = main_state.physics_world.rigid_body_set.insert(
+    //     RigidBodyBuilder::new_static()
+    //     .translation(
+    //         3.0,
+    //         5.0
+    //     )
+    //     .build()
+    // );
+    // main_state.physics_world.collider_set.insert(
+    //     ColliderBuilder::segment(nalgebra::Point2::new(-5.0, 0.0), nalgebra::Point2::new(5.0, 1.0)).build(),
+    //     rigid_body_handle,
+    //     &mut main_state.physics_world.rigid_body_set
+    // );
+
+    // let entity = main_state.world.spawn((
+    //     //RectComponent {
+    //     //    rect: graphics::Rect::new(0.0, 0.0, 32.0, 32.0),
+    //     //},
+    //     RigidBodyComponent {
+    //         rigid_body_handle,
+    //     },
+    //     SpriteComponent::new(&mut context, "/rust.png"),
+    // ));
 
     // Run event loop
     

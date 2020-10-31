@@ -1,7 +1,7 @@
 
 use ggez::{
     graphics,
-    Context
+    Context,
 };
 use hecs::*;
 use nalgebra;
@@ -11,7 +11,11 @@ use crate::components::*;
 
 use crate::settings;
 
-use rapier2d::geometry::ShapeType;
+use rapier2d::geometry::
+{
+    ShapeType,
+    Segment
+};
 
 pub fn system_physics_debug_draw(world: &mut World, physics_world: &mut PhysicsWorld, context: &mut Context) {
     for (id, (rigid_body,)) in &mut world.query::<(&RigidBodyComponent,)>() {
@@ -55,7 +59,13 @@ pub fn system_physics_debug_draw(world: &mut World, physics_world: &mut PhysicsW
                     let capsule = shape.as_capsule().unwrap();
                 },
                 ShapeType::Segment => {
-
+                    let segment = shape.downcast_ref::<Segment>().unwrap();
+                    meshes.push(graphics::Mesh::new_line(
+                       context,
+                       &[segment.a * settings::UNIT_SIZE, segment.b * settings::UNIT_SIZE],
+                       1.0,
+                       color 
+                    ).unwrap());
                 },
                 ShapeType::Triangle => {
                     let triangle = shape.as_triangle().unwrap();
