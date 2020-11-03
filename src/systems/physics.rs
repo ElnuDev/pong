@@ -1,5 +1,3 @@
-use rapier2d::*;
-
 use ggez::*;
 use crate::physics_world::*;
 

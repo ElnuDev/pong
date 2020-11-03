@@ -1672,7 +1672,6 @@ dependencies = [
  "ggez",
  "hecs",
  "nalgebra 0.23.0",
- "rand 0.7.3",
  "rapier2d",
 ]
 
@@ -1905,9 +1904,9 @@ dependencies = [
 
 [[package]]
 name = "rapier2d"
-version = "0.3.0"
+version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0f293d0232aaaa50508c2eb811291aa0e98096447a995b77e603df45941c098c"
+checksum = "b5b22fedc339d8b461554ef2bed5009afaa3d88b07609a58ae69ddd18a5c1873"
 dependencies = [
  "approx 0.4.0",
  "arrayvec 0.5.2",

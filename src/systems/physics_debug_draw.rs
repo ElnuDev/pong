@@ -18,11 +18,12 @@ use rapier2d::geometry::
 };
 
 pub fn system_physics_debug_draw(world: &mut World, physics_world: &mut PhysicsWorld, context: &mut Context) {
-    for (id, (rigid_body,)) in &mut world.query::<(&RigidBodyComponent,)>() {
-        let mut draw_param = graphics::DrawParam::default();
-        draw_param.dest = (rapier2d::na::Point2::from(physics_world.rigid_body_set.get(rigid_body.rigid_body_handle).unwrap().position.translation.vector) * settings::UNIT_SIZE).into();
-        let mut meshes: Vec<graphics::Mesh> = Vec::new();
-        for collider_handle in physics_world.rigid_body_set.get(rigid_body.rigid_body_handle).unwrap().colliders() {
+    for (_id, (rigid_body,)) in &mut world.query::<(&RigidBodyComponent,)>() {
+        let rigid_body = physics_world.rigid_body_set.get(rigid_body.rigid_body_handle).unwrap();
+        let draw_param = graphics::DrawParam::default()
+            .dest(rapier2d::na::Point2::from(rigid_body.position.translation.vector) * settings::UNIT_SIZE)
+            .rotation(rigid_body.position.rotation.angle());
+        for collider_handle in rigid_body.colliders() {
             let collider = physics_world.collider_set.get(*collider_handle).unwrap();
             let shape = collider.shape();
             let draw_mode = graphics::DrawMode::Stroke(graphics::StrokeOptions::DEFAULT);
@@ -30,20 +31,21 @@ pub fn system_physics_debug_draw(world: &mut World, physics_world: &mut PhysicsW
             match shape.shape_type() {
                 ShapeType::Ball => {
                     let ball = shape.as_ball().unwrap();
-                    meshes.push(graphics::Mesh::new_circle(
+                    let mesh = graphics::Mesh::new_circle(
                         context,
                         draw_mode,
                         nalgebra::Point2::new(0.0, 0.0),
                         ball.radius * settings::UNIT_SIZE,
                         0.1, color
-                    ).unwrap());
+                    ).unwrap();
+                    graphics::draw(context, &mesh, draw_param).unwrap();
                 },
                 ShapeType::Polygon => {
-
+                    unimplemented!();
                 },
                 ShapeType::Cuboid => {
                     let cuboid = shape.as_cuboid().unwrap();
-                    meshes.push(graphics::Mesh::new_rectangle(
+                    let mesh = graphics::Mesh::new_rectangle(
                         context,
                         draw_mode,
                         graphics::Rect::new(
@@ -53,22 +55,57 @@ pub fn system_physics_debug_draw(world: &mut World, physics_world: &mut PhysicsW
                             cuboid.half_extents.y * 2.0 * settings::UNIT_SIZE
                         ),
                         color
-                    ).unwrap());
+                    ).unwrap();
+                    graphics::draw(context, &mesh, draw_param).unwrap();
                 },
                 ShapeType::Capsule => {
                     let capsule = shape.as_capsule().unwrap();
+                    let mesh = graphics::Mesh::new_circle(
+                        context,
+                        draw_mode,
+                        capsule.segment.a * settings::UNIT_SIZE,
+                        capsule.radius * settings::UNIT_SIZE,
+                        0.1, color
+                    ).unwrap();
+                    graphics::draw(context, &mesh, draw_param).unwrap();
+
+                    let mesh = graphics::Mesh::new_circle(
+                        context,
+                        draw_mode,
+                        capsule.segment.b * settings::UNIT_SIZE,
+                        capsule.radius * settings::UNIT_SIZE,
+                        0.1, color
+                    ).unwrap();
+                    graphics::draw(context, &mesh, draw_param).unwrap();
+
+                    let mesh = graphics::Mesh::new_line(
+                       context,
+                       &[(capsule.segment.a + nalgebra::Vector2::new(0.0, capsule.radius)) * settings::UNIT_SIZE, (capsule.segment.b + nalgebra::Vector2::new(0.0, capsule.radius)) * settings::UNIT_SIZE],
+                       1.0,
+                       color 
+                    ).unwrap();
+                    graphics::draw(context, &mesh, draw_param).unwrap();
+
+                    let mesh = graphics::Mesh::new_line(
+                        context,
+                        &[(capsule.segment.a - nalgebra::Vector2::new(0.0, capsule.radius)) * settings::UNIT_SIZE, (capsule.segment.b - nalgebra::Vector2::new(0.0, capsule.radius)) * settings::UNIT_SIZE],
+                        1.0,
+                        color 
+                     ).unwrap();
+                     graphics::draw(context, &mesh, draw_param).unwrap();
                 },
                 ShapeType::Segment => {
                     let segment = shape.downcast_ref::<Segment>().unwrap();
-                    meshes.push(graphics::Mesh::new_line(
+                    let mesh = graphics::Mesh::new_line(
                        context,
                        &[segment.a * settings::UNIT_SIZE, segment.b * settings::UNIT_SIZE],
                        1.0,
                        color 
-                    ).unwrap());
+                    ).unwrap();
+                    graphics::draw(context, &mesh, draw_param).unwrap();
                 },
                 ShapeType::Triangle => {
-                    let triangle = shape.as_triangle().unwrap();
+                    unimplemented!();
                 },
                 ShapeType::Trimesh => {
                     let trimesh = shape.as_trimesh().unwrap();
@@ -78,29 +115,23 @@ pub fn system_physics_debug_draw(world: &mut World, physics_world: &mut PhysicsW
                         .collect::<Vec<nalgebra::Point2<f32>>>();
                     let indices = trimesh.indices();
                     for index in indices {
-                        meshes.push(
-                            graphics::Mesh::new_polygon(
-                                context,
-                                draw_mode,
-                                &vec![
-                                    scaled_vertices[index.x as usize],
-                                    scaled_vertices[index.y as usize],
-                                    scaled_vertices[index.z as usize]
-                                ],
-                                color
-                            ).unwrap()
-                        );
+                        let mesh = graphics::Mesh::new_polygon(
+                            context,
+                            draw_mode,
+                            &vec![
+                                scaled_vertices[index.x as usize],
+                                scaled_vertices[index.y as usize],
+                                scaled_vertices[index.z as usize]
+                            ],
+                            color
+                        ).unwrap();
+                        graphics::draw(context, &mesh, draw_param).unwrap();
                     }
                 },
                 ShapeType::HeightField => {
-                    let heightfield = shape.as_heightfield().unwrap();
+                    unimplemented!();
                 },
             };
-            for mesh in &meshes {
-                graphics::draw(context, mesh, draw_param).unwrap();
-            }
         }
-        //let mesh = graphics::Mesh::new_rectangle(context, graphics::DrawMode::fill(), rect, graphics::WHITE).unwrap();
-        //graphics::draw(context, &mesh, draw_param).unwrap();
     }
 }
